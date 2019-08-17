@@ -8,7 +8,7 @@ green = 0.32
 blue = 0.65
 
 # Training Iterations
-t = 100
+t = 1000
 iteration = 0
 iterationgroup = 0
 r = randint(0, 256)
@@ -33,23 +33,27 @@ def rgbtohue(r, g, b):
     return round(h*360)
 
 # Nodes
-oaaa = randint(0, 1000001)/1000000-0.5
-oaab = randint(0, 1000001)/1000000-0.5
-oaac = randint(0, 1000001)/1000000-0.5
-oaba = randint(0, 1000001)/1000000-0.5
-oabb = randint(0, 1000001)/1000000-0.5
+oaaa = (randint(0, 1000001)/500000-1)
+oaab = (randint(0, 1000001)/500000-1)
+oaac = (randint(0, 1000001)/500000-1)
+oaba = (randint(0, 1000001)/500000-1)
+oabb = (randint(0, 1000001)/500000-1)
 
-obaa = randint(0, 1000001)/1000000-0.5
-obab = randint(0, 1000001)/1000000-0.5
-obac = randint(0, 1000001)/1000000-0.5
-obba = randint(0, 1000001)/1000000-0.5
-obbb = randint(0, 1000001)/1000000-0.5
+obaa = (randint(0, 1000001)/500000-1)
+obab = (randint(0, 1000001)/500000-1)
+obac = (randint(0, 1000001)/500000-1)
+obba = (randint(0, 1000001)/500000-1)
+obbb = (randint(0, 1000001)/500000-1)
 
 ocaa = 0
 ocab = 0
 ocac = 0
 ocba = 0
 ocbb = 0
+
+netamultifitness = 0
+netbmultifitness = 0
+netcmultifitness = 0
 
 # Training
 print("Training...")
@@ -78,11 +82,11 @@ while iteration < t:
     obba = obaa
     obbb = obbb
 
-    ocaa = randint(0, 1000001)/1000000-0.5
-    ocab = randint(0, 1000001)/1000000-0.5
-    ocac = randint(0, 1000001)/1000000-0.5
-    ocba = randint(0, 1000001)/1000000-0.5
-    ocbb = randint(0, 1000001)/1000000-0.5
+    ocaa = (randint(0, 1000001)/500000-1)
+    ocab = (randint(0, 1000001)/500000-1)
+    ocac = (randint(0, 1000001)/500000-1)
+    ocba = (randint(0, 1000001)/500000-1)
+    ocbb = (randint(0, 1000001)/500000-1)
 
     ba = 0
     bb = 0
@@ -96,6 +100,9 @@ while iteration < t:
     sbd = 0
     sbe = 0
 
+    bnetmultifitness = 0
+    sbnetmultifitness = 0
+
     # Solve Network Outputs (Linear Activation Function)
     oao = ((((((((r+g+b)/3)+oaaa)+(((r+g+b)/3)+oaab)+(((r+g+b)/3)+oaac))/3)+oaba)+((((((r+g+b)/3)+oaaa)+(((r+g+b)/3)+oaab)+(((r+g+b)/3)+oaac))/3)+oabb))/2)
     obo = ((((((((r+g+b)/3)+obaa)+(((r+g+b)/3)+obab)+(((r+g+b)/3)+obac))/3)+obba)+((((((r+g+b)/3)+obaa)+(((r+g+b)/3)+obab)+(((r+g+b)/3)+obac))/3)+obbb))/2)
@@ -108,65 +115,88 @@ while iteration < t:
     oaoabsolute = absolute(oaoq)
     oboabsolute = absolute(oboq)
     ocoabsolute = absolute(ocoq)
+    netamultifitness = netamultifitness+oaoabsolute
+    netbmultifitness = netbmultifitness+oboabsolute
+    netcmultifitness = netcmultifitness+ocoabsolute
+    best = min(netamultifitness, netbmultifitness, netcmultifitness)
+    worst = max(netamultifitness, netbmultifitness, netbmultifitness)
     fitness = ((oaoabsolute+oboabsolute+ocoabsolute)/3)*100
-    worst = max(oaoabsolute, oboabsolute, ocoabsolute)
-    best = min(oaoabsolute, oboabsolute, ocoabsolute)
+
     print("Generation Fitness:", fitness)
 
     # Prepare Variables Next Generation and Define Best Networks
-    if best is oaoabsolute:
+    if best is netamultifitness:
         ba = oaaa
         bb = oaab
         bc = oaac
         bd = oaba
         be = oabb
+        bnetmultifitness = netamultifitness
 
-    if best is oboabsolute:
+    if best is netbmultifitness:
         ba = obaa
         bb = obab
         bc = obac
         bd = obba
         be = obbb
+        bnetmultifitness = netbmultifitness
 
-    if best is ocoabsolute:
+    if best is netcmultifitness:
         ba = ocaa
         bb = ocab
         bc = ocac
         bd = ocba
         be = ocbb
+        bnetmultifitness = netcmultifitness
 
-    if worst is not oaoabsolute and best is not oaoabsolute:
+    if worst is not netamultifitness and best is not netamultifitness:
         sba = oaaa
         sbb = oaab
         sbc = oaac
         sbd = oaba
         sbe = oabb
+        sbnetmultifitness = netamultifitness
     
-    if worst is not oboabsolute and best is not oboabsolute:
+    if worst is not netbmultifitness and best is not netbmultifitness:
         sba = obaa
         sbb = obab
         sbc = obac
         sbd = obba
         sbe = obbb
+        sbnetmultifitness = netbmultifitness
     
-    if worst is not ocoabsolute and best is not ocoabsolute:
+    if worst is not netcmultifitness and best is not netcmultifitness:
         sba = ocaa
         sbb = ocab
         sbc = ocac
         sbd = ocba
         sbe = ocbb
+        sbnetmultifitness = netcmultifitness
+    
+    if worst is netamultifitness:
+        netamultifitness = 0
+    
+    if worst is netbmultifitness:
+        netbmultifitness = 0
+    
+    if worst is netcmultifitness:
+        netcmultifitness = 0
     
     oaaa = ba
     oaab = bb
     oaac = bc
     oaba = bd
     oabb = be
+    netamultifitness = bnetmultifitness
 
     obaa = sba
     obab = sbb
     obac = sbc
     obba = sbd
     obbb = sbe
+    netbmultifitness = sbnetmultifitness
+
+    netcmultifitness = 0
 
     iteration = iteration+1
     
@@ -176,4 +206,4 @@ print()
 print("Result:", round(oao*360),"Actual:", rgbtohue(red, green, blue))
 print()
 print("Debug Info:")
-print("Last Generation Hue:", h, "Network A, B, and C Distance from Target:", oaoabsolute, oboabsolute, ocoabsolute)
+print("Last Generation Hue:", h, "Network A, B, and C Distance from Target:", oaoabsolute, oboabsolute, ocoabsolute, "Best of Each:", netamultifitness, netbmultifitness, netcmultifitness)
