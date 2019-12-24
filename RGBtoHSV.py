@@ -54,6 +54,9 @@ ocbb = 0
 netamultifitness = 0
 netbmultifitness = 0
 netcmultifitness = 0
+oag = 0
+obg = 0
+ocg = 0
 
 # Training
 print("Training...")
@@ -93,12 +96,14 @@ while iteration < t:
     bc = 0
     bd = 0
     be = 0
+    bg = 0
 
     sba = 0
     sbb = 0
     sbc = 0
     sbd = 0
     sbe = 0
+    sbg = 0
 
     bnetmultifitness = 0
     sbnetmultifitness = 0
@@ -118,75 +123,88 @@ while iteration < t:
     netamultifitness = netamultifitness+oaoabsolute
     netbmultifitness = netbmultifitness+oboabsolute
     netcmultifitness = netcmultifitness+ocoabsolute
-    best = min(netamultifitness, netbmultifitness, netcmultifitness)
-    worst = max(netamultifitness, netbmultifitness, netbmultifitness)
+    oarealmulti = netamultifitness/oag
+    obrealmulti = netbmultifitness/obg
+    ocrealmulti = netcmultifitness/ocg
+    best = min(oarealmulti, obrealmulti, ocrealmulti)
+    worst = max(oarealmulti, obrealmulti, ocrealmulti)
     fitness = ((oaoabsolute+oboabsolute+ocoabsolute)/3)*100
 
     print("Generation Fitness:", fitness)
 
     # Prepare Variables Next Generation and Define Best Networks
-    if best is netamultifitness:
+    if best is oarealmulti:
         ba = oaaa
         bb = oaab
         bc = oaac
         bd = oaba
         be = oabb
+        bg = oag+1
         bnetmultifitness = netamultifitness
 
-    if best is netbmultifitness:
+    if best is obrealmulti:
         ba = obaa
         bb = obab
         bc = obac
         bd = obba
         be = obbb
+        bg = obg+1
         bnetmultifitness = netbmultifitness
 
-    if best is netcmultifitness:
+    if best is ocrealmulti:
         ba = ocaa
         bb = ocab
         bc = ocac
         bd = ocba
         be = ocbb
+        bg = ocg+1
         bnetmultifitness = netcmultifitness
 
-    if worst is not netamultifitness and best is not netamultifitness:
+    if worst is not oarealmulti and best is not oarealmulti:
         sba = oaaa
         sbb = oaab
         sbc = oaac
         sbd = oaba
         sbe = oabb
+        sbg = oag+1
         sbnetmultifitness = netamultifitness
     
-    if worst is not netbmultifitness and best is not netbmultifitness:
+    if worst is not obrealmulti and best is not obrealmulti:
         sba = obaa
         sbb = obab
         sbc = obac
         sbd = obba
         sbe = obbb
+        sbg = obg+1
         sbnetmultifitness = netbmultifitness
     
-    if worst is not netcmultifitness and best is not netcmultifitness:
+    if worst is not ocrealmulti and best is not ocrealmulti:
         sba = ocaa
         sbb = ocab
         sbc = ocac
         sbd = ocba
         sbe = ocbb
+        sbg = ocg+1
         sbnetmultifitness = netcmultifitness
     
-    if worst is netamultifitness:
+    if worst is oarealmulti:
         netamultifitness = 0
+        oag = 0
     
-    if worst is netbmultifitness:
+    if worst is obrealmulti:
         netbmultifitness = 0
+        obg = 0
     
-    if worst is netcmultifitness:
+    if worst is ocrealmulti:
         netcmultifitness = 0
+        ocg = 0
     
     oaaa = ba
     oaab = bb
     oaac = bc
     oaba = bd
     oabb = be
+    oag = bg
     netamultifitness = bnetmultifitness
 
     obaa = sba
@@ -194,9 +212,11 @@ while iteration < t:
     obac = sbc
     obba = sbd
     obbb = sbe
+    obg = sbg
     netbmultifitness = sbnetmultifitness
 
     netcmultifitness = 0
+    ocg = 0
 
     iteration = iteration+1
     
